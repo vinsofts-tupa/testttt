@@ -1,0 +1,136 @@
+<% layout('/pages/index') -%>
+<div class="container-fluid">
+  <div class="side-body">
+    <div class="row">
+      <div class="col-xs-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="title">ADD
+                <%=type.replace('/','').toUpperCase()%>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- <form method="POST"> -->
+            <div class="form-group">
+              <label for="UserNameA">UserName Bên A</label>
+              <input type="text" class="form-control" id="UserNameA" name="UserNameA" placeholder="UserNameA">
+            </div>
+            <div class="form-group">
+              <label for="HomeAddress">Home Address</label>
+              <input type="text" class="form-control" id="HomeAddress" name="HomeAddress" placeholder="Home Address">
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="number" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number">
+            </div>
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" class="form-control" id="age" name="age" placeholder="Age">
+            </div>
+
+            <div class="form-group">
+                <label for="ProductId">ProductId</label>
+                <input type="number" class="form-control" id="ProductId" name="ProductId" placeholder="Product Id">
+              </div>
+              <div class="form-group">
+                <label for="compensation">compensa tion</label>
+                <input type="number" class="form-control" id="compensation" name="compensation" placeholder="Compensa tion">
+              </div>
+              <div class="form-group">
+                <label for="expireTime">expireTime</label>
+                <input type="number" class="form-control" id="expireTime" name="expireTime" placeholder="expire Time">
+              </div>
+            <button type="button" class="btn btn-success" onclick="Create()">Submit</button>
+            <!-- </form> -->
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="title">Info
+                <%=type.replace('/','').toUpperCase()%>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped" cellspacing="0" width="100%">
+              <tbody>
+                <tr>
+                  <th>AddressContract</th>
+                  <td id="AddressContract"></td>
+                </tr>
+                <tr>
+                    <th>AddressA</th>
+                    <td id="tdAddressA"></td>
+                  </tr>
+                <tr>
+                  <td>UserNameA</td>
+                  <td id="tdUserNameA"></td>
+                </tr>
+                <tr>
+                  <td>Home Address</td>
+                  <td id="idHomeAddress"></td>
+                </tr>
+                <tr>
+                  <td>Phone Number</td>
+                  <td id="tdPhoneNumber"></td>
+                </tr>
+                <tr>
+                </tr>
+                <td>Age</td>
+                <td id="tdAge"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function Create() {
+    var UserNameA = $("#UserNameA").val();
+    var HomeAddress = $("#HomeAddress").val();
+    var phoneNumber = parseInt($("#phoneNumber").val());
+    var age = parseInt($("#age").val());
+
+    var ProductId = $("#ProductId").val();
+    var compensation = $("#compensation").val();
+    var expireTime = parseInt($("#expireTime").val());
+
+    if (confirm("Bạn có đồng ý tạo bên A")) {
+      var acc = await web3.eth.getAccounts();
+      var Mycontract = contract5abi.deploy({
+        data: data5,
+        arguments: [UserNameA, HomeAddress, phoneNumber, age, 1]
+      })
+      Mycontract.send({
+          from: acc[0],
+          gasPrice: web3.utils.toHex(web3.utils.toWei('1', 'gwei'))
+        })
+        .on('transactionHash', function(transactionHash){ 
+          console.log('transactionHash',transactionHash)
+        })
+        .then(async function (newContractInstance) {
+          var ads = newContractInstance.options.address;
+          var detailnow = await newContractInstance.methods.detailAccount(acc[0]).call();
+          var initWarranty = await newContractInstance.methods.initWarranty(expireTime,compensation,ProductId).send({from:acc[0]});
+          $("#AddressContract").text(ads)
+          $("#tdAddressA").text(detailnow['owner'])
+          $("#tdUserNameA").text(detailnow['name'])
+          $("#idHomeAddress").text(detailnow['homeAddr'])
+          $("#tdPhoneNumber").text(detailnow['phoneNumber'])
+          $("#tdAge").text(detailnow['age'])
+
+          var saveHistory = await contract4.methods.saveHistory(ads).send({from: acc[0]});
+        });
+    }
+  }
+</script>

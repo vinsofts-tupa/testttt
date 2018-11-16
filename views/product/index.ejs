@@ -1,0 +1,45 @@
+<% layout('/pages/index') -%>
+<div class="container-fluid">
+    <div class="side-body">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="title"></div>
+                        </div>
+                        <a href="<%=type%>add" type="button" class="pull-right btn btn-success"> ADD </a>
+                    </div>
+                    <div class="card-body">
+                        <table class=" table table-striped" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>ID</th>
+                                    <th>MFG</th>
+                                    <th>EXP</th>
+                                    <th>State</th>
+                                    <th>Name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="datas"> </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+ window.addEventListener('load', function () {
+    contract2.methods.getAllProduct().call().then(datas=>{
+        console.log(datas)
+        $("#datas").empty();
+          datas.forEach((v,k)=>{
+            $("#datas").append(`<tr><td>${k+1}</td> <td> ${v['id']}</td> <td>${v['MFG']}</td>  <td>${v['EXP']}</td> <td>${v['state']}</td> <td>${v['name']}</td><td><a href="<%=type%>edit?id=${v['id']}">Edit</a></td> </tr>`)
+          })
+    });
+})
+</script> 
